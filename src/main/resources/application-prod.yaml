@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://donations-db.cxoaaw8g4mh7.us-east-2.rds.amazonaws.com:5432/donation-db
+    username: donationdb
+    password: donationdb1$
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # 👈 THIS creates/updates tables
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

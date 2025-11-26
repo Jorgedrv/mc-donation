@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: mc-donation
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+server:
+  servlet:
+    context-path: '/donation/v1'
