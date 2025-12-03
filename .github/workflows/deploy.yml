@@ -23,9 +23,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build Docker image
+      # BUILD WITH NO CACHE (IMPORTANT)
+      - name: Build Docker image (no cache)
         run: |
-          docker build -t mc-donation .
+          docker build --no-cache -t mc-donation .
 
       - name: Tag Docker image
         run: |
@@ -42,6 +43,18 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull 536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
+            echo "Stopping old container..."
             docker rm -f mc-donation || true
-            docker run -d --restart=always -p 8080:8080 --name mc-donation 536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
+            
+            echo "Cleaning old images..."
+            docker image prune -a -f || true
+
+            echo "Pulling latest image from ECR..."
+            docker pull 536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
+
+            echo "Starting new container..."
+            docker run -d --restart=always -p 8080:8080 \
+              --name mc-donation \
+              536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
+
+            echo "DONE. Check logs with: docker logs mc-donation"
