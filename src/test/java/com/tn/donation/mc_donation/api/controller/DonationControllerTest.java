@@ -45,8 +45,10 @@ class DonationControllerTest {
     @Test
     void createDonation_WhenValidRequest_ReturnsCreatedStatusAndResponse() {
         Long id = 1L;
+        Long donorId = 10L;
+        Long campaignId = 100L;
         Instant fixedInstant = Instant.parse("2024-01-01T00:00:00Z");
-        Donation donation = new Donation(id, id, id, 100.00, fixedInstant);
+        Donation donation = new Donation(id, donorId, campaignId, 100.00, fixedInstant);
 
         CreateDonationRequest request = new CreateDonationRequest(id, id, 100.00);
 
@@ -56,7 +58,7 @@ class DonationControllerTest {
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(id, responseEntity.getBody().getId());
-        assertEquals(id, responseEntity.getBody().getCampaignId());
+        assertEquals(campaignId, responseEntity.getBody().getCampaignId());
         assertEquals(100.00, responseEntity.getBody().getAmount());
 
         verify(createDonationService).create(any(CreateDonationRequest.class));
@@ -65,8 +67,10 @@ class DonationControllerTest {
     @Test
     void listDonations_WhenDonationsExist_ReturnsOkStatusAndList() {
         Long id = 1L;
+        Long donorId = 10L;
+        Long campaignId = 100L;
         Instant fixedInstant = Instant.parse("2024-01-01T00:00:00Z");
-        Donation donation = new Donation(id, id, id, 100.00, fixedInstant);
+        Donation donation = new Donation(id, donorId, campaignId, 100.00, fixedInstant);
 
         when(listDonationsService.findAll()).thenReturn(List.of(donation));
 
@@ -83,8 +87,10 @@ class DonationControllerTest {
     @Test
     void getDonation_WhenDonationExists_ReturnsOkStatusAndList() {
         Long id = 1L;
+        Long donorId = 10L;
+        Long campaignId = 100L;
         Instant fixedInstant = Instant.parse("2024-01-01T00:00:00Z");
-        Donation donation = new Donation(id, id, id, 100.00, fixedInstant);
+        Donation donation = new Donation(id, donorId, campaignId, 100.00, fixedInstant);
 
         when(getDonationsService.findById(id)).thenReturn(donation);
 
@@ -100,18 +106,21 @@ class DonationControllerTest {
     @Test
     void updateDonation_WhenValidRequest_ReturnsOkStatusAndUpdatedResponse() {
         Long id = 1L;
+        Long donorId = 10L;
+        Long campaignId = 100L;
         Double amount = 200.00;
         Instant fixedInstant = Instant.parse("2024-01-01T00:00:00Z");
 
-        Donation donation = new Donation(id, id, id, amount, fixedInstant);
+        Donation donation = new Donation(id, donorId, campaignId, amount, fixedInstant);
 
-        CreateDonationRequest request = new CreateDonationRequest(id, id, amount);
+        CreateDonationRequest request = new CreateDonationRequest(donorId, campaignId, amount);
 
         when(updateDonationService.update(id, request)).thenReturn(donation);
 
         ResponseEntity<DonationResponse> entity = donationController.updateDonation(id, request);
 
         assertEquals(HttpStatus.OK, entity.getStatusCode());
+        assertNotNull(entity.getBody());
         assertEquals(id, entity.getBody().getId());
         assertEquals(amount, entity.getBody().getAmount());
 

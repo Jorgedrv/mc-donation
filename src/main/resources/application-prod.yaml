@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://donations-db.cxoaaw8g4mh7.us-east-2.rds.amazonaws.com:5432/donation-db
-    username: donationdb
-    password: donationdb1$
+    url: jdbc:postgresql://donations-db.cxoaaw8g4mh7.us-east-2.rds.amazonaws.com:5432/postgres
+    username: dbamin
+    password: "donationsdb1$"
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
