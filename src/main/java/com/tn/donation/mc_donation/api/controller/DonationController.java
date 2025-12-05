@@ -3,16 +3,26 @@ package com.tn.donation.mc_donation.api.controller;
 import com.tn.donation.mc_donation.api.dto.CreateDonationRequest;
 import com.tn.donation.mc_donation.api.dto.DonationResponse;
 import com.tn.donation.mc_donation.api.mapper.DonationMapper;
-import com.tn.donation.mc_donation.application.donation.*;
+import com.tn.donation.mc_donation.application.donation.CreateDonationService;
+import com.tn.donation.mc_donation.application.donation.DeleteDonationService;
+import com.tn.donation.mc_donation.application.donation.GetDonationsService;
+import com.tn.donation.mc_donation.application.donation.ListDonationsService;
+import com.tn.donation.mc_donation.application.donation.UpdateDonationService;
 import com.tn.donation.mc_donation.domain.model.Donation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,11 +42,9 @@ public class DonationController {
             summary = "Create a donation",
             description = "Creates a new donation for a donor and a campaign."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Donation successfully created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload"),
-            @ApiResponse(responseCode = "404", description = "Related Donor or Campaign not found")
-    })
+    @ApiResponse(responseCode = "201", description = "Donation successfully created")
+    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+    @ApiResponse(responseCode = "404", description = "Related Donor or Campaign not found")
     @PostMapping
     public ResponseEntity<DonationResponse> createDonation(@RequestBody CreateDonationRequest request) {
         Donation donation = createDonationService.create(request);
@@ -48,9 +56,7 @@ public class DonationController {
             summary = "List all donations",
             description = "Retrieves a list of all donations in the system."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donations retrieved successfully")
-    })
+    @ApiResponse(responseCode = "200", description = "Donations retrieved successfully")
     @GetMapping("/all")
     public ResponseEntity<List<DonationResponse>> listDonations() {
         List<DonationResponse> response = listDonationsService.findAll()
@@ -64,10 +70,8 @@ public class DonationController {
             summary = "Get donation by ID",
             description = "Retrieves a single donation by its ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donation retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Donation not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Donation retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Donation not found")
     @GetMapping("/{id}")
     public ResponseEntity<DonationResponse> getDonation(@PathVariable Long id) {
         Donation donation = getDonationsService.findById(id);
@@ -78,11 +82,9 @@ public class DonationController {
             summary = "Update an existing donation",
             description = "Updates the donor, campaign, or amount of an existing donation."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donation successfully updated"),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload"),
-            @ApiResponse(responseCode = "404", description = "Donation not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Donation successfully updated")
+    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+    @ApiResponse(responseCode = "404", description = "Donation not found")
     @PutMapping("/{id}")
     public ResponseEntity<DonationResponse> updateDonation(
             @PathVariable Long id,
@@ -95,10 +97,8 @@ public class DonationController {
             summary = "Delete a donation",
             description = "Deletes a donation using its unique ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Donation successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Donation not found")
-    })
+    @ApiResponse(responseCode = "204", description = "Donation successfully deleted")
+    @ApiResponse(responseCode = "404", description = "Donation not found")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDonation(@PathVariable Long id) {
         deleteDonationService.delete(id);
