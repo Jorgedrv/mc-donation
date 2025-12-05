@@ -3,16 +3,26 @@ package com.tn.donation.mc_donation.api.controller;
 import com.tn.donation.mc_donation.api.dto.CampaignResponse;
 import com.tn.donation.mc_donation.api.dto.CreateCampaignRequest;
 import com.tn.donation.mc_donation.api.mapper.CampaignMapper;
-import com.tn.donation.mc_donation.application.campaign.*;
+import com.tn.donation.mc_donation.application.campaign.CreateCampaignService;
+import com.tn.donation.mc_donation.application.campaign.DeleteCampaignService;
+import com.tn.donation.mc_donation.application.campaign.GetCampaignsService;
+import com.tn.donation.mc_donation.application.campaign.ListCampaignsService;
+import com.tn.donation.mc_donation.application.campaign.UpdateCampaignService;
 import com.tn.donation.mc_donation.domain.model.Campaign;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,10 +42,8 @@ public class CampaignController {
             summary = "Create a campaign",
             description = "Creates a new fundraising campaign."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Campaign successfully created"),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload")
-    })
+    @ApiResponse(responseCode = "201", description = "Campaign successfully created")
+    @ApiResponse(responseCode = "400", description = "Invalid request payload")
     @PostMapping
     public ResponseEntity<CampaignResponse> createCampaign(
             @RequestBody CreateCampaignRequest request) {
@@ -50,9 +58,7 @@ public class CampaignController {
             summary = "List all campaigns",
             description = "Retrieves all fundraising campaigns."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campaign list retrieved successfully")
-    })
+    @ApiResponse(responseCode = "200", description = "Campaign list retrieved successfully")
     @GetMapping("/all")
     public ResponseEntity<List<CampaignResponse>> listCampaigns() {
         List<CampaignResponse> response = listCampaignsService.findAll()
@@ -67,10 +73,8 @@ public class CampaignController {
             summary = "Get campaign by ID",
             description = "Retrieves a campaign using its unique ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campaign retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Campaign not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Campaign retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Campaign not found")
     @GetMapping("/{id}")
     public ResponseEntity<CampaignResponse> getCampaign(@PathVariable Long id) {
         Campaign campaign = getCampaignsService.findById(id);
@@ -81,11 +85,9 @@ public class CampaignController {
             summary = "Update a campaign",
             description = "Updates the name or description of an existing campaign."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Campaign updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request payload"),
-            @ApiResponse(responseCode = "404", description = "Campaign not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Campaign updated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid request payload")
+    @ApiResponse(responseCode = "404", description = "Campaign not found")
     @PutMapping("/{id}")
     public ResponseEntity<CampaignResponse> updateCampaign(
             @PathVariable Long id,
@@ -99,10 +101,8 @@ public class CampaignController {
             summary = "Delete a campaign",
             description = "Deletes a campaign using its unique ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Campaign successfully deleted"),
-            @ApiResponse(responseCode = "404", description = "Campaign not found")
-    })
+    @ApiResponse(responseCode = "204", description = "Campaign successfully deleted")
+    @ApiResponse(responseCode = "404", description = "Campaign not found")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCampaign(@PathVariable Long id) {
         deleteCampaignService.delete(id);
