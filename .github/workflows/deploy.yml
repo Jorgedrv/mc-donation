@@ -42,14 +42,6 @@ jobs:
           ./gradlew clean test jacocoTestReport sonar \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: SonarCloud Quality Gate
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-          organization: ${{ secrets.SONAR_ORG }}
-
   deploy:
     runs-on: ubuntu-latest
     needs: test
