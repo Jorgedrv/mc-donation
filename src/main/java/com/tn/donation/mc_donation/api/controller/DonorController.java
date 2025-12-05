@@ -3,16 +3,26 @@ package com.tn.donation.mc_donation.api.controller;
 import com.tn.donation.mc_donation.api.dto.CreateDonorRequest;
 import com.tn.donation.mc_donation.api.dto.DonorResponse;
 import com.tn.donation.mc_donation.api.mapper.DonorMapper;
-import com.tn.donation.mc_donation.application.donor.*;
+import com.tn.donation.mc_donation.application.donor.CreateDonorService;
+import com.tn.donation.mc_donation.application.donor.DeleteDonorService;
+import com.tn.donation.mc_donation.application.donor.GetDonorsService;
+import com.tn.donation.mc_donation.application.donor.ListDonorsService;
+import com.tn.donation.mc_donation.application.donor.UpdateDonorService;
 import com.tn.donation.mc_donation.domain.model.Donor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -32,10 +42,8 @@ public class DonorController {
             summary = "Create a donor",
             description = "Registers a new donor in the system."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Donor created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data")
-    })
+    @ApiResponse(responseCode = "201", description = "Donor created successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid request data")
     @PostMapping
     public ResponseEntity<DonorResponse> createDonor(
             @RequestBody CreateDonorRequest request) {
@@ -50,9 +58,7 @@ public class DonorController {
             summary = "List all donors",
             description = "Retrieves all registered donors."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donor list retrieved successfully")
-    })
+    @ApiResponse(responseCode = "200", description = "Donor list retrieved successfully")
     @GetMapping("/all")
     public ResponseEntity<List<DonorResponse>> listDonors() {
         List<DonorResponse> response = listDonorsService.findAll()
@@ -67,10 +73,8 @@ public class DonorController {
             summary = "Get donor by ID",
             description = "Retrieves donor information using its ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donor retrieved successfully"),
-            @ApiResponse(responseCode = "404", description = "Donor not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Donor retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Donor not found")
     @GetMapping("/{id}")
     public ResponseEntity<DonorResponse> getDonor(@PathVariable Long id) {
         Donor donor = getDonorsService.findById(id);
@@ -81,11 +85,9 @@ public class DonorController {
             summary = "Update a donor",
             description = "Updates the donor's name or email."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Donor updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request data"),
-            @ApiResponse(responseCode = "404", description = "Donor not found")
-    })
+    @ApiResponse(responseCode = "200", description = "Donor updated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid request data")
+    @ApiResponse(responseCode = "404", description = "Donor not found")
     @PutMapping("/{id}")
     public ResponseEntity<DonorResponse> updateDonor(
             @PathVariable Long id,
@@ -99,10 +101,8 @@ public class DonorController {
             summary = "Delete a donor",
             description = "Deletes a donor by ID."
     )
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Donor deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Donor not found")
-    })
+    @ApiResponse(responseCode = "204", description = "Donor deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Donor not found")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDonor(@PathVariable Long id) {
         deleteDonorService.deleteById(id);
