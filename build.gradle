@@ -49,6 +49,24 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 }
 
+sonar {
+	properties {
+		if (project.hasProperty("local")) {
+			file("sonar-local.properties").withInputStream {
+				def props = new Properties()
+				props.load(it)
+				props.forEach { key, value ->
+					property key.toString(), value.toString()
+				}
+			}
+		} else {
+			property "sonar.projectKey", "Jorgedrv_mc-donation"
+			property "sonar.projectName", "MC-Donation"
+			property "sonar.organization", "jorgedrv"
+		}
+	}
+}
+
 jacoco {
 	toolVersion = "0.8.12"
 }

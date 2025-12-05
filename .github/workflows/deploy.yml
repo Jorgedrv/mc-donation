@@ -46,6 +46,7 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml \
             -Dsonar.projectBaseDir=.
+            -Dsonar.branch.name=master
 
       - name: SonarCloud Quality Gate
         uses: sonarsource/sonarcloud-github-action@master
