@@ -51,17 +51,15 @@ dependencies {
 
 sonar {
 	properties {
-		property "sonar.host.url", "http://localhost:9000"
-		property "sonar.login", "squ_a755426f1717974725c6879dfddcce7a8bbbfa15"
-		property "sonar.scm.disabled", "true"
-
-		property "sonar.exclusions", [
-				'**/McDonationApplication.java',
-				'**/infrastructure/repository/jpa/entity/**',
-				'**/common/handler/**',
-				'**/common/exception/ErrorResponse.java',
-				'**/infrastructure/initializer/**'
-		]
+		if (project.hasProperty("local")) {
+			file("sonar-local.properties").withInputStream {
+				def props = new Properties()
+				props.load(it)
+				props.forEach { key, value ->
+					property key.toString(), value.toString()
+				}
+			}
+		}
 	}
 }
 
