@@ -59,6 +59,14 @@ sonarqube {
 					property key.toString(), value.toString()
 				}
 			}
+		} else {
+			file("sonar-cloud.properties").withInputStream { stream ->
+				def props = new Properties()
+				props.load(stream)
+				props.forEach { key, value ->
+					property key.toString(), value.toString()
+				}
+			}
 		}
 	}
 }
