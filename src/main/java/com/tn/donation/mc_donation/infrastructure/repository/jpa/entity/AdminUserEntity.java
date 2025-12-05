@@ -6,14 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "admin_users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AdminUser {
+public class AdminUserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

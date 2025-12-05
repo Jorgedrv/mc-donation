@@ -1,7 +1,7 @@
 package com.tn.donation.mc_donation.application.security;
 
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.AdminUserRepository;
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUser;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +17,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AdminUser admin = adminUserRepository.findByUsername(username)
+        AdminUserEntity admin = adminUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
 
         return User.builder()

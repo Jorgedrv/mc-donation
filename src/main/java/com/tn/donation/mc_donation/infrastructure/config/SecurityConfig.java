@@ -1,6 +1,7 @@
 package com.tn.donation.mc_donation.infrastructure.config;
 
 import com.tn.donation.mc_donation.application.security.JwtAuthenticationFilter;
+import com.tn.donation.mc_donation.application.security.MyUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +11,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,17 +24,32 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
-    private final UserDetailsService uds;
+    private final MyUserDetailsService myUserDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter, UserDetailsService uds) {
+    public SecurityConfig(JwtAuthenticationFilter jwtFilter, MyUserDetailsService myUserDetailsService) {
         this.jwtFilter = jwtFilter;
-        this.uds = uds;
+        this.myUserDetailsService = myUserDetailsService;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+        http.csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        // --- PUBLIC ENDPOINTS ---
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/donations/**").permitAll()
+                        .requestMatchers("/campaigns/**").permitAll()
+
+                        // --- PRIVATE (ADMIN ONLY) ---
+                        //.requestMatchers("/auth/register").hasRole("ADMIN")
+                        //.requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // --- EVERYTHING ELSE ---
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
@@ -44,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(uds);
+        provider.setUserDetailsService(myUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
