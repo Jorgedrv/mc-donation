@@ -1,7 +1,7 @@
 package com.tn.donation.mc_donation.application.security;
 
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.AdminUserRepository;
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUser;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,7 +32,7 @@ class MyUserDetailsServiceTest {
     void loadUserByUsername_shouldReturnUser() {
         String username = "peterparker";
 
-        AdminUser user = new AdminUser();
+        AdminUserEntity user = new AdminUserEntity();
         user.setId(1L);
         user.setUsername(username);
         user.setPassword("123456");

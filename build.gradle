@@ -59,7 +59,8 @@ sonar {
 				'**/McDonationApplication.java',
 				'**/infrastructure/repository/jpa/entity/**',
 				'**/common/handler/**',
-				'**/common/exception/ErrorResponse.java'
+				'**/common/exception/ErrorResponse.java',
+				'**/infrastructure/initializer/**'
 		]
 	}
 }
@@ -81,7 +82,8 @@ jacocoTestReport {
 					'**/McDonationApplication.java',
 					'**/infrastructure/repository/jpa/entity/**',
 					'**/common/handler/**',
-					'**/common/exception/ErrorResponse.java'
+					'**/common/exception/ErrorResponse.java',
+					'**/infrastructure/initializer/**'
 			])
 		}))
 	}
