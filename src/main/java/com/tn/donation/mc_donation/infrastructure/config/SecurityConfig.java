@@ -4,6 +4,7 @@ import com.tn.donation.mc_donation.application.security.JwtAuthenticationFilter;
 import com.tn.donation.mc_donation.application.security.MyUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -38,18 +39,21 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // --- PUBLIC ENDPOINTS ---
+                        // --- PUBLIC ---
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/donations/**").permitAll()
-                        .requestMatchers("/campaigns/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/campaigns/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/donations/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/donations/**").permitAll()
 
                         // --- PRIVATE (ADMIN ONLY) ---
-                        //.requestMatchers("/auth/register").hasRole("ADMIN")
-                        //.requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/campaigns/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/campaigns/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/campaigns/**").hasRole("ADMIN")
 
-                        // --- EVERYTHING ELSE ---
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
