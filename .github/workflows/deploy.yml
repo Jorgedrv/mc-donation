@@ -74,15 +74,13 @@ jobs:
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.7
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            set -ex
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}"
 
             echo "--- Removing old container ---"
             docker rm -f mc-donation || true
@@ -93,9 +91,6 @@ jobs:
             echo "--- Logging into ECR ---"
             aws ecr get-login-password --region us-east-2 \
               | docker login --username AWS --password-stdin 536700114597.dkr.ecr.us-east-2.amazonaws.com
-
-            echo "--- Checking docker info (registry auth) ---"
-            docker info
 
             echo "--- Pulling latest image ---"
             docker pull 536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
