@@ -76,6 +76,12 @@ mc-donation
 
 ## 📌 API Endpoints
 
+### **Authentication**
+| Method | Endpoint          |
+|--------|-------------------|
+| POST   | `/auth/login`     |
+| POST   | `/auth/register`  |
+
 ### **Campaigns**
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -121,7 +127,7 @@ build/reports/jacoco/test/html/index.html
 
 ### Run SonarQube
 ```sh
-./gradlew sonar
+./gradlew sonar -Plocal
 ```
 ### Running the Application
 ```sh

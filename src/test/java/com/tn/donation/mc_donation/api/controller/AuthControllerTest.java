@@ -2,6 +2,9 @@ package com.tn.donation.mc_donation.api.controller;
 
 import com.tn.donation.mc_donation.api.dto.LoginRequest;
 import com.tn.donation.mc_donation.api.dto.LoginResponse;
+import com.tn.donation.mc_donation.api.dto.RegisterRequest;
+import com.tn.donation.mc_donation.api.dto.RegisterResponse;
+import com.tn.donation.mc_donation.application.auth.AuthService;
 import com.tn.donation.mc_donation.application.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +38,9 @@ class AuthControllerTest {
 
     @Mock
     JwtService jwtService;
+
+    @Mock
+    AuthService authService;
 
     @InjectMocks
     AuthController authController;
@@ -81,5 +87,36 @@ class AuthControllerTest {
 
         verify(authManager, times(1)).authenticate(any());
         verify(jwtService, never()).generateToken(any());
+    }
+
+    @Test
+    void register_shouldReturnUserAndOkResponse() {
+        RegisterRequest request = new RegisterRequest(
+                "admin",
+                "admin@test.com",
+                "password"
+        );
+
+        RegisterResponse response = new RegisterResponse(
+                1L,
+                "admin",
+                "admin@test.com",
+                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZWRyd.me2qJBFhSIZtvPEYmrKdJmbIPKtt0RVgb",
+                "User registered successfully"
+        );
+
+        when(authService.register(any(RegisterRequest.class)))
+                .thenReturn(response);
+
+        ResponseEntity<RegisterResponse> result = authController.register(request);
+
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(1L, result.getBody().id());
+        assertEquals("admin", result.getBody().username());
+        assertEquals("admin@test.com", result.getBody().email());
+        assertEquals("User registered successfully", result.getBody().message());
+
+        verify(authService).register(any(RegisterRequest.class));
     }
 }
