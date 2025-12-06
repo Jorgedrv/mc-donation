@@ -1,7 +1,8 @@
 package com.tn.donation.mc_donation.application.security;
 
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.AdminUserRepository;
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUserEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,17 +14,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MyUserDetailsService implements UserDetailsService {
 
-    private final AdminUserRepository adminUserRepository;
+    private final UserJpaRepository userJpaRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AdminUserEntity admin = adminUserRepository.findByUsername(username)
+        UserEntity admin = userJpaRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
+
+        String[] roles = admin.getRoles()
+                .stream()
+                .map(RoleEntity::getName)   // "ADMIN"
+                .toArray(String[]::new);
 
         return User.builder()
                 .username(admin.getUsername())
                 .password(admin.getPassword())
-                .roles(admin.getRole()) // ADMIN
+                .roles(roles)  // Spring will add "ROLE_"
                 .build();
     }
 }

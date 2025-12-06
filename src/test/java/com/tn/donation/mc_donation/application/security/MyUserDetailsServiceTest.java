@@ -1,7 +1,8 @@
 package com.tn.donation.mc_donation.application.security;
 
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.AdminUserRepository;
-import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.AdminUserEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -23,7 +25,7 @@ import static org.mockito.Mockito.when;
 class MyUserDetailsServiceTest {
 
     @Mock
-    private AdminUserRepository adminUserRepository;
+    private UserJpaRepository userJpaRepository;
 
     @InjectMocks
     MyUserDetailsService myUserDetailsService;
@@ -32,13 +34,13 @@ class MyUserDetailsServiceTest {
     void loadUserByUsername_shouldReturnUser() {
         String username = "peterparker";
 
-        AdminUserEntity user = new AdminUserEntity();
+        UserEntity user = new UserEntity();
         user.setId(1L);
         user.setUsername(username);
         user.setPassword("123456");
-        user.setRole("ADMIN");
+        user.setRoles(Set.of(new RoleEntity(null, "ADMIN")));
 
-        when(adminUserRepository.findByUsername(username))
+        when(userJpaRepository.findByUsername(username))
                 .thenReturn(Optional.of(user));
 
         UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
@@ -53,19 +55,19 @@ class MyUserDetailsServiceTest {
                         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
         );
 
-        verify(adminUserRepository).findByUsername(username);
+        verify(userJpaRepository).findByUsername(username);
     }
 
     @Test
     void loadUserByUsername_shouldReturnNotFoundException() {
         String username = "unknown";
 
-        when(adminUserRepository.findByUsername(username))
+        when(userJpaRepository.findByUsername(username))
                 .thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class,
                 () -> myUserDetailsService.loadUserByUsername(username));
 
-        verify(adminUserRepository).findByUsername(username);
+        verify(userJpaRepository).findByUsername(username);
     }
 }
