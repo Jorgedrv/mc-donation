@@ -27,6 +27,10 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtFilter;
     private final MyUserDetailsService myUserDetailsService;
 
+    private static final String DONATIONS_PATTERN = "/donations/**";
+    private static final String CAMPAIGNS_PATTERN = "/campaigns/**";
+    private static final String ADMIN = "ADMIN";
+
     public SecurityConfig(JwtAuthenticationFilter jwtFilter, MyUserDetailsService myUserDetailsService) {
         this.jwtFilter = jwtFilter;
         this.myUserDetailsService = myUserDetailsService;
@@ -45,14 +49,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/campaigns/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/donations/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/donations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, CAMPAIGNS_PATTERN).permitAll()
+                        .requestMatchers(HttpMethod.GET, DONATIONS_PATTERN).permitAll()
+                        .requestMatchers(HttpMethod.POST, DONATIONS_PATTERN).permitAll()
 
                         // --- PRIVATE (ADMIN ONLY) ---
-                        .requestMatchers(HttpMethod.POST, "/campaigns/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/campaigns/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/campaigns/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.PUT, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, CAMPAIGNS_PATTERN).hasRole(ADMIN)
 
                         .anyRequest().authenticated()
                 )
