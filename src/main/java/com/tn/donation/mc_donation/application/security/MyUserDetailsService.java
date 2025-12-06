@@ -23,13 +23,13 @@ public class MyUserDetailsService implements UserDetailsService {
 
         String[] roles = admin.getRoles()
                 .stream()
-                .map(RoleEntity::getName)   // "ADMIN"
+                .map(RoleEntity::getName)
                 .toArray(String[]::new);
 
         return User.builder()
                 .username(admin.getUsername())
                 .password(admin.getPassword())
-                .roles(roles)  // Spring will add "ROLE_"
+                .roles(roles)
                 .build();
     }
 }

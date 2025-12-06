@@ -1,9 +1,6 @@
 package com.tn.donation.mc_donation.common.handler;
 
-import com.tn.donation.mc_donation.common.exception.CampaignNotFoundException;
-import com.tn.donation.mc_donation.common.exception.DonationNotFoundException;
-import com.tn.donation.mc_donation.common.exception.DonorNotFoundException;
-import com.tn.donation.mc_donation.common.exception.ErrorResponse;
+import com.tn.donation.mc_donation.common.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,5 +48,23 @@ public class GlobalExceptionHandler {
                         Instant.now()
                 )
         );
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<?> handleUserExists(UserAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("USER_EXISTS", ex.getMessage(), Instant.now()));
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<?> handleEmailExists(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse("EMAIL_EXISTS", ex.getMessage(), Instant.now()));
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    public ResponseEntity<?> handleRoleNotFound(RoleNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("ROLE_NOT_FOUND", ex.getMessage(), Instant.now()));
     }
 }
