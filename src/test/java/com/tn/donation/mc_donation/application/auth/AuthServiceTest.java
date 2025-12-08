@@ -6,16 +6,18 @@ import com.tn.donation.mc_donation.application.security.JwtService;
 import com.tn.donation.mc_donation.common.exception.EmailAlreadyExistsException;
 import com.tn.donation.mc_donation.common.exception.RoleNotFoundException;
 import com.tn.donation.mc_donation.common.exception.UserAlreadyExistsException;
+import com.tn.donation.mc_donation.domain.enums.UserStatus;
+import com.tn.donation.mc_donation.infrastructure.messaging.EmailService;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.RoleJpaRepository;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -25,10 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -44,6 +43,12 @@ class AuthServiceTest {
 
     @Mock
     JwtService jwtService;
+
+    @Mock
+    VerificationTokenService verificationTokenService;
+
+    @Mock
+    EmailService emailService;
 
     @InjectMocks
     AuthService authService;
@@ -112,7 +117,7 @@ class AuthServiceTest {
         RegisterRequest request =
                 new RegisterRequest("testuser", "test@mail.com", "1234");
 
-        String token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZWRyd.me2qJBFhSIZtvPEYmrKdJmbIPKtt0RVgb";
+        String token = "a81b2d73-5de4-4495-b851-98ab3c69ddb6";
 
         when(userJpaRepository.existsByEmail("test@mail.com")).thenReturn(false);
         when(userJpaRepository.existsByUsername("testuser")).thenReturn(false);
@@ -125,12 +130,16 @@ class AuthServiceTest {
         saved.setPassword("1234");
         saved.setUsername("testuser");
         saved.setEmail("test@mail.com");
+        saved.setStatus(UserStatus.PENDING);
 
         when(encoder.encode("1234")).thenReturn("hashed-password");
 
         when(userJpaRepository.save(any(UserEntity.class))).thenReturn(saved);
 
-        when(jwtService.generateToken(any(UserDetails.class))).thenReturn(token);
+        when(verificationTokenService.createToken(any(UserEntity.class)))
+                .thenReturn(token);
+
+        doNothing().when(emailService).sendVerificationEmail("test@mail.com", token);
 
         RegisterResponse response = authService.register(request);
 
@@ -138,11 +147,15 @@ class AuthServiceTest {
         assertEquals(1L, response.id());
         assertEquals("testuser", response.username());
         assertEquals("test@mail.com", response.email());
-        assertEquals(token, response.token());
-        assertEquals("User registered successfully", response.message());
+        assertEquals("User registered successfully. Please check your email to verify your account.",
+                response.message());
+
+        ArgumentCaptor<UserEntity> userCaptor = ArgumentCaptor.forClass(UserEntity.class);
+        verify(userJpaRepository).save(userCaptor.capture());
+        assertEquals(UserStatus.PENDING, userCaptor.getValue().getStatus());
 
         verify(encoder).encode("1234");
         verify(userJpaRepository).save(any(UserEntity.class));
-        verify(jwtService).generateToken(any(UserDetails.class));
+        verify(emailService).sendVerificationEmail("test@mail.com", token);
     }
 }

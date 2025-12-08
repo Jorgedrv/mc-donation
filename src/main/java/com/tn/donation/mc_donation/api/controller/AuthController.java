@@ -5,6 +5,7 @@ import com.tn.donation.mc_donation.api.dto.LoginResponse;
 import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
 import com.tn.donation.mc_donation.application.auth.AuthService;
+import com.tn.donation.mc_donation.application.auth.VerificationTokenService;
 import com.tn.donation.mc_donation.application.security.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,9 +18,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Login", description = "Authentication Login")
@@ -31,6 +34,7 @@ public class AuthController {
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
     private final AuthService authService;
+    private final VerificationTokenService verificationTokenService;
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
@@ -70,5 +74,17 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
+    }
+
+    @Operation(
+            summary = "Verify user email",
+            description = "Verifies a user's email based on the verification token."
+    )
+    @ApiResponse(responseCode = "200", description = "Email verified successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid or expired token.")
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        verificationTokenService.verifyToken(token);
+        return ResponseEntity.ok("Email verified successfully. You can now log in.");
     }
 }
