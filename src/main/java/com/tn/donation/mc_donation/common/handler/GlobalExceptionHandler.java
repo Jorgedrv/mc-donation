@@ -14,39 +14,34 @@ import java.time.Instant;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CampaignNotFoundException.class)
-    public ResponseEntity<String> handleCampaignNotFound(CampaignNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleCampaignNotFound(CampaignNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("CAMPAIGN_NOT_FOUND", ex.getMessage(), Instant.now()));
     }
 
     @ExceptionHandler(DonorNotFoundException.class)
-    public ResponseEntity<String> handleDonorNotFound(DonorNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleDonorNotFound(DonorNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("DONOR_NOT_FOUND", ex.getMessage(), Instant.now()));
     }
 
     @ExceptionHandler(DonationNotFoundException.class)
-    public ResponseEntity<String> handleDonationNotFound(DonationNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleDonationNotFound(DonationNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("DONATION_NOT_FOUND", ex.getMessage(), Instant.now()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                new ErrorResponse(
-                        "INVALID_CREDENTIALS",
-                        "Username or password is incorrect",
-                        Instant.now()
-                )
+                new ErrorResponse("INVALID_CREDENTIALS", "Username or password is incorrect", Instant.now())
         );
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAuthException(AuthenticationException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                new ErrorResponse(
-                        "AUTH_ERROR",
-                        ex.getMessage(),
-                        Instant.now()
-                )
+                new ErrorResponse("AUTH_ERROR", ex.getMessage(), Instant.now())
         );
     }
 
@@ -66,5 +61,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleRoleNotFound(RoleNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("ROLE_NOT_FOUND", ex.getMessage(), Instant.now()));
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpired(TokenExpiredException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse("TOKEN_EXPIRED", ex.getMessage(), Instant.now())
+        );
+    }
+
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ErrorResponse> handleEmailSending(EmailSendingException ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new ErrorResponse("EMAIL_SENDING_ERROR", ex.getMessage(), Instant.now())
+        );
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<?> handleInvalidToken(InvalidTokenException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("INVALID_TOKEN", ex.getMessage(), Instant.now()));
     }
 }

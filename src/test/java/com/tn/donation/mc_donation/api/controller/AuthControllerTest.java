@@ -5,7 +5,10 @@ import com.tn.donation.mc_donation.api.dto.LoginResponse;
 import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
 import com.tn.donation.mc_donation.application.auth.AuthService;
+import com.tn.donation.mc_donation.application.auth.VerificationTokenService;
 import com.tn.donation.mc_donation.application.security.JwtService;
+import com.tn.donation.mc_donation.domain.enums.UserStatus;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,6 +45,9 @@ class AuthControllerTest {
 
     @Mock
     AuthService authService;
+
+    @Mock
+    VerificationTokenService verificationTokenService;
 
     @InjectMocks
     AuthController authController;
@@ -91,17 +98,18 @@ class AuthControllerTest {
 
     @Test
     void register_shouldReturnUserAndOkResponse() {
+        String username = "admin";
+        String email = "admin@test.com";
         RegisterRequest request = new RegisterRequest(
-                "admin",
-                "admin@test.com",
-                "password"
+                username,
+                email,
+                "admin1234"
         );
 
         RegisterResponse response = new RegisterResponse(
                 1L,
-                "admin",
-                "admin@test.com",
-                "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZWRyd.me2qJBFhSIZtvPEYmrKdJmbIPKtt0RVgb",
+                username,
+                email,
                 "User registered successfully"
         );
 
@@ -113,10 +121,30 @@ class AuthControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result.getBody());
         assertEquals(1L, result.getBody().id());
-        assertEquals("admin", result.getBody().username());
-        assertEquals("admin@test.com", result.getBody().email());
+        assertEquals(username, result.getBody().username());
+        assertEquals(email, result.getBody().email());
         assertEquals("User registered successfully", result.getBody().message());
 
         verify(authService).register(any(RegisterRequest.class));
+    }
+
+    @Test
+    void verifyEmail_shouldReturnSuccessMessage() {
+        String message = "Email verified successfully. You can now log in.";
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUsername("testuser");
+        userEntity.setEmail("testuser@test.com");
+        userEntity.setStatus(UserStatus.PENDING);
+
+        String token = "a81b2d73-5de4-4495-b851-98ab3c69ddb6";
+
+        doNothing().when(verificationTokenService).verifyToken(token);
+
+        ResponseEntity<String> response = authController.verifyEmail(token);
+
+        assertNotNull(response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(message, response.getBody());
     }
 }

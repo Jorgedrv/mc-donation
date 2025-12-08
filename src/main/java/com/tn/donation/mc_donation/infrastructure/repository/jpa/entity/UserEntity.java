@@ -1,15 +1,7 @@
 package com.tn.donation.mc_donation.infrastructure.repository.jpa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import com.tn.donation.mc_donation.domain.enums.UserStatus;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.HashSet;
@@ -35,6 +27,9 @@ public class UserEntity {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Enumerated(EnumType.STRING)
+    private UserStatus status;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

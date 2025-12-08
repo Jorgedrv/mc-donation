@@ -5,6 +5,18 @@ spring:
     hibernate:
       ddl-auto: update
 
+  mail:
+    host: email-smtp.us-east-2.amazonaws.com
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.trust: email-smtp.us-east-2.amazonaws.com
+
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -18,3 +30,6 @@ server:
 jwt:
   secret: ${JWT_SECRET:myDefaultLocalSecretKey12345678901234567890}
   expiration: ${JWT_EXPIRATION:900000}
+
+messaging:
+  verification-url: ${MESSAGING_VERIFICATION_URL:http://localhost/test}
