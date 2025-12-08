@@ -1,9 +1,7 @@
 package com.tn.donation.mc_donation.infrastructure.messaging;
 
-import com.tn.donation.mc_donation.application.security.JwtService;
 import com.tn.donation.mc_donation.common.exception.EmailSendingException;
 import jakarta.mail.internet.MimeMessage;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
