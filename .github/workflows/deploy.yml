@@ -81,6 +81,12 @@ jobs:
           script: |
             export JWT_SECRET="${{ secrets.JWT_SECRET }}"
             export JWT_EXPIRATION="${{ secrets.JWT_EXPIRATION }}"
+            export DB_URL="${{ secrets.DB_URL }}"
+            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export SMTP_USERNAME="${{ secrets.SMTP_USERNAME }}"
+            export SMTP_PASSWORD="${{ secrets.SMTP_PASSWORD }}"
+            export MESSAGING_VERIFICATION_URL="${{ secrets.MESSAGING_VERIFICATION_URL }}"
 
             echo "--- Removing old container ---"
             docker rm -f mc-donation || true
@@ -100,6 +106,12 @@ jobs:
               --name mc-donation \
               -e JWT_SECRET="$JWT_SECRET" \
               -e JWT_EXPIRATION="$JWT_EXPIRATION" \
+              -e DB_URL="$DB_URL" \
+              -e DB_USERNAME="$DB_USERNAME" \
+              -e DB_PASSWORD="$DB_PASSWORD" \
+              -e SMTP_USERNAME="$SMTP_USERNAME" \
+              -e SMTP_PASSWORD="$SMTP_PASSWORD" \
+              -e MESSAGING_VERIFICATION_URL="$MESSAGING_VERIFICATION_URL" \
               -e SPRING_PROFILES_ACTIVE=prod \
               536700114597.dkr.ecr.us-east-2.amazonaws.com/mc-donation:latest
 
