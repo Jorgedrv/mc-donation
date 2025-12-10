@@ -1,9 +1,7 @@
 package com.tn.donation.mc_donation.api.mapper;
 
 import com.tn.donation.mc_donation.api.dto.DonationResponse;
-import com.tn.donation.mc_donation.api.dto.DonorResponse;
 import com.tn.donation.mc_donation.domain.model.Donation;
-import com.tn.donation.mc_donation.domain.model.Donor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

@@ -1,6 +1,7 @@
 package com.tn.donation.mc_donation.application.security;
 
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.MenuEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,18 @@ class MyUserDetailsServiceTest {
     void loadUserByUsername_shouldReturnUser() {
         String username = "peterparker";
 
+        MenuEntity menu = new MenuEntity();
+        menu.setId(1L);
+        menu.setOrderIndex(1);
+        menu.setName("Dashboard");
+        menu.setPath("/dashboard");
+        menu.setIcon("iconoir:home");
+
         UserEntity user = new UserEntity();
         user.setId(1L);
         user.setUsername(username);
         user.setPassword("123456");
-        user.setRoles(Set.of(new RoleEntity(null, "ADMIN")));
+        user.setRoles(Set.of(new RoleEntity(null, "ADMIN", Set.of(menu))));
 
         when(userJpaRepository.findByUsername(username))
                 .thenReturn(Optional.of(user));
