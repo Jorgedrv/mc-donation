@@ -21,8 +21,10 @@ import java.io.PrintWriter;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.lenient;
@@ -62,7 +64,48 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    void doFilterInternal_shouldReturnOkForOptionsRequests() throws Exception {
+        when(request.getMethod()).thenReturn("OPTIONS");
+
+        filter.doFilterInternal(request, response, filterChain);
+
+        verify(response).setStatus(HttpServletResponse.SC_OK);
+        verify(filterChain, never()).doFilter(any(), any());
+    }
+
+    @Test
+    void shouldNotFilter_shouldSkipOptionsRequests() {
+        when(request.getMethod()).thenReturn("OPTIONS");
+        when(request.getServletPath()).thenReturn("/any/path");
+
+        boolean result = filter.shouldNotFilter(request);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldNotFilter_shouldEvaluatePathAndSkipAuth() {
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getServletPath()).thenReturn("/auth/test");
+
+        boolean result = filter.shouldNotFilter(request);
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldNotFilter_shouldNotSkipNormalRequests() {
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getServletPath()).thenReturn("/campaigns");
+
+        boolean result = filter.shouldNotFilter(request);
+
+        assertFalse(result);
+    }
+
+    @Test
     void doFilterInternal_shouldPassThroughWhenNoAuthHeader() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn(null);
 
         filter.doFilterInternal(request, response, filterChain);
@@ -73,6 +116,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldPassThroughWhenNoBearerToken() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("good123");
 
         filter.doFilterInternal(request, response, filterChain);
@@ -83,6 +127,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldReturnInvalidTokenError() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer bad.token");
         when(jwtService.extractUsername("bad.token")).thenThrow(new JwtException("Invalid"));
 
@@ -94,6 +139,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldReturnExpiredTokenError() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer abc123");
         when(jwtService.extractUsername("abc123")).thenThrow(new ExpiredJwtException(null, null, "expired"));
 
@@ -105,6 +151,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void shouldNotAuthenticateWhenUsernameIsNull() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer token123");
         when(jwtService.extractUsername("token123")).thenReturn(null);
 
@@ -118,6 +165,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void shouldNotAuthenticateWhenTokenIsInvalid() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer token123");
         when(jwtService.extractUsername("token123")).thenReturn("peter");
 
@@ -137,6 +185,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldSkipAuthenticationWhenContextAlreadyHasAuth() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer abc123");
         when(jwtService.extractUsername("abc123")).thenReturn("Peter");
 
@@ -156,6 +205,7 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldAuthenticateUserWhenTokenValid() throws Exception {
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeader("Authorization")).thenReturn("Bearer good123");
         when(jwtService.extractUsername("good123")).thenReturn("Peter");
 
