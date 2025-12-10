@@ -5,8 +5,8 @@ import com.tn.donation.mc_donation.api.dto.LoginResponse;
 import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
 import com.tn.donation.mc_donation.application.auth.AuthService;
+import com.tn.donation.mc_donation.application.auth.LoginService;
 import com.tn.donation.mc_donation.application.auth.VerificationTokenService;
-import com.tn.donation.mc_donation.application.security.JwtService;
 import com.tn.donation.mc_donation.domain.enums.UserStatus;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,7 +40,7 @@ class AuthControllerTest {
     Authentication authentication;
 
     @Mock
-    JwtService jwtService;
+    LoginService loginService;
 
     @Mock
     AuthService authService;
@@ -54,17 +53,13 @@ class AuthControllerTest {
 
     @Test
     void login_shouldReturnOkResponse() {
-        User userDetails = new User(
-                "admin",
-                "password",
-                java.util.Collections.emptyList()
-        );
-
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-
         when(authManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
-        when(jwtService.generateToken(userDetails)).thenReturn("FAKE_JWT_TOKEN");
+
+        LoginResponse fakeResponse = new LoginResponse("FAKE_JWT_TOKEN", null, null);
+
+        when(loginService.buildLoginResponse(authentication))
+                .thenReturn(fakeResponse);
 
         LoginRequest request = new LoginRequest("steve", "12345");
 
@@ -72,13 +67,15 @@ class AuthControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("FAKE_JWT_TOKEN", response.getBody().token());
+        assertEquals("FAKE_JWT_TOKEN", response.getBody().getToken());
 
         verify(authManager, times(1))
                 .authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtService, times(1))
-                .generateToken(userDetails);
+
+        verify(loginService, times(1))
+                .buildLoginResponse(authentication);
     }
+
 
     @Test
     void login_shouldThrow_WhenInvalidCredentials() {
@@ -93,13 +90,14 @@ class AuthControllerTest {
         );
 
         verify(authManager, times(1)).authenticate(any());
-        verify(jwtService, never()).generateToken(any());
+        verify(loginService, never()).buildLoginResponse(any());
     }
 
     @Test
     void register_shouldReturnUserAndOkResponse() {
         String username = "admin";
         String email = "admin@test.com";
+
         RegisterRequest request = new RegisterRequest(
                 username,
                 email,

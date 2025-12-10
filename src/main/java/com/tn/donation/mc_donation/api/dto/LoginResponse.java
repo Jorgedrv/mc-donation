@@ -1,3 +1,17 @@
 package com.tn.donation.mc_donation.api.dto;
 
-public record LoginResponse(String token) {}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoginResponse {
+
+    private String token;
+    private UserDTO user;
+    private List<MenuDTO> menus;
+}

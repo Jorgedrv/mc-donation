@@ -2,6 +2,7 @@ package com.tn.donation.mc_donation.infrastructure.initializer;
 
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.RoleJpaRepository;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.MenuEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Set;
 
 @Profile("dev")
 @Component
@@ -27,11 +30,17 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) {
         log.info("Initial User");
 
+        MenuEntity menu = new MenuEntity();
+        menu.setName("Campaigns");
+        menu.setPath("/campaigns");
+        menu.setIcon("iconoir:fire-flame");
+        menu.setOrderIndex(2);
+
         RoleEntity adminRole = roleJpaRepository.findByName("ADMIN")
-                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "ADMIN")));
+                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "ADMIN", Set.of(menu))));
 
         RoleEntity userRole = roleJpaRepository.findByName("USER")
-                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "USER")));
+                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "USER", Set.of(menu))));
 
         if (userJpaRepository.findByUsername("admin").isEmpty()) {
             UserEntity admin = new UserEntity();

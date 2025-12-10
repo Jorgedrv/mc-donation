@@ -2,7 +2,6 @@ package com.tn.donation.mc_donation.application.auth;
 
 import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
-import com.tn.donation.mc_donation.application.security.JwtService;
 import com.tn.donation.mc_donation.common.exception.EmailAlreadyExistsException;
 import com.tn.donation.mc_donation.common.exception.RoleNotFoundException;
 import com.tn.donation.mc_donation.common.exception.UserAlreadyExistsException;
@@ -10,6 +9,7 @@ import com.tn.donation.mc_donation.domain.enums.UserStatus;
 import com.tn.donation.mc_donation.infrastructure.messaging.EmailService;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.RoleJpaRepository;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaRepository;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.MenuEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -40,9 +45,6 @@ class AuthServiceTest {
 
     @Mock
     PasswordEncoder encoder;
-
-    @Mock
-    JwtService jwtService;
 
     @Mock
     VerificationTokenService verificationTokenService;
@@ -122,7 +124,14 @@ class AuthServiceTest {
         when(userJpaRepository.existsByEmail("test@mail.com")).thenReturn(false);
         when(userJpaRepository.existsByUsername("testuser")).thenReturn(false);
 
-        RoleEntity role = new RoleEntity(1L, "USER");
+        MenuEntity menu = new MenuEntity();
+        menu.setId(1L);
+        menu.setOrderIndex(1);
+        menu.setName("Dashboard");
+        menu.setPath("/dashboard");
+        menu.setIcon("iconoir:home");
+
+        RoleEntity role = new RoleEntity(1L, "USER", Set.of(menu));
         when(roleJpaRepository.findByName("USER")).thenReturn(Optional.of(role));
 
         UserEntity saved = new UserEntity();
