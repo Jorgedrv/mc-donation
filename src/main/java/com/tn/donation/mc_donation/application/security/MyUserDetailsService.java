@@ -15,8 +15,8 @@ public class MyUserDetailsService implements UserDetailsService {
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity admin = userJpaRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity admin = userJpaRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Admin not found"));
 
         return new CustomUserDetails(admin);

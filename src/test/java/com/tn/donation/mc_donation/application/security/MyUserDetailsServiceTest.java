@@ -33,7 +33,9 @@ class MyUserDetailsServiceTest {
 
     @Test
     void loadUserByUsername_shouldReturnUser() {
-        String username = "peterparker";
+        String name = "Peter";
+        String lastname = "Parker";
+        String email = "test@test.com";
 
         MenuEntity menu = new MenuEntity();
         menu.setId(1L);
@@ -44,17 +46,19 @@ class MyUserDetailsServiceTest {
 
         UserEntity user = new UserEntity();
         user.setId(1L);
-        user.setUsername(username);
+        user.setName(name);
+        user.setLastname(lastname);
+        user.setEmail(email);
         user.setPassword("123456");
         user.setRoles(Set.of(new RoleEntity(null, "ADMIN", Set.of(menu))));
 
-        when(userJpaRepository.findByUsername(username))
+        when(userJpaRepository.findByEmail(email))
                 .thenReturn(Optional.of(user));
 
-        UserDetails userDetails = myUserDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = myUserDetailsService.loadUserByUsername(email);
 
         assertNotNull(userDetails);
-        assertEquals(username, userDetails.getUsername());
+        assertEquals(email, userDetails.getUsername());
         assertEquals("123456", userDetails.getPassword());
 
         assertTrue(
@@ -63,19 +67,19 @@ class MyUserDetailsServiceTest {
                         .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))
         );
 
-        verify(userJpaRepository).findByUsername(username);
+        verify(userJpaRepository).findByEmail(email);
     }
 
     @Test
     void loadUserByUsername_shouldReturnNotFoundException() {
-        String username = "unknown";
+        String username = "unknown@test.com";
 
-        when(userJpaRepository.findByUsername(username))
+        when(userJpaRepository.findByEmail(username))
                 .thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class,
                 () -> myUserDetailsService.loadUserByUsername(username));
 
-        verify(userJpaRepository).findByUsername(username);
+        verify(userJpaRepository).findByEmail(username);
     }
 }

@@ -41,7 +41,8 @@ class VerificationTokenServiceTest {
     @Test
     void createToken_shouldReturnValidToken() {
         UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("testuser");
+        userEntity.setName("Elon");
+        userEntity.setName("Musk");
         userEntity.setEmail("testuser@test.com");
         userEntity.setStatus(UserStatus.PENDING);
 
@@ -70,7 +71,8 @@ class VerificationTokenServiceTest {
         String token = "a81b2d73-5de4-4495-b851-98ab3c69ddb6";
 
         UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("testuser");
+        userEntity.setName("Elon");
+        userEntity.setLastname("Musk");
         userEntity.setEmail("testuser@test.com");
         userEntity.setPassword("testuser12345");
         userEntity.setStatus(UserStatus.PENDING);
@@ -130,7 +132,8 @@ class VerificationTokenServiceTest {
         String token = "a81b2d73-5de4-4495-b851-98ab3c69ddb6";
 
         UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("testuser");
+        userEntity.setName("Elon");
+        userEntity.setLastname("Musk");
         userEntity.setEmail("testuser@test.com");
         userEntity.setPassword("testuser12345");
         userEntity.setStatus(UserStatus.PENDING);

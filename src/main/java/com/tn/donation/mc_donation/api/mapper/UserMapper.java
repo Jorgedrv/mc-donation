@@ -11,7 +11,8 @@ public class UserMapper {
     public static UserDTO toResponse(UserEntity userEntity) {
         return new UserDTO(
                 userEntity.getId(),
-                userEntity.getUsername(),
+                userEntity.getName(),
+                userEntity.getLastname(),
                 userEntity.getEmail()
         );
     }

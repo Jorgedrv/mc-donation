@@ -46,7 +46,8 @@ class LoginServiceTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         userEntity.setPassword("1234");
-        userEntity.setUsername("testuser");
+        userEntity.setName("Elon");
+        userEntity.setLastname("Musk");
         userEntity.setEmail("test@mail.com");
         userEntity.setStatus(UserStatus.PENDING);
         userEntity.setRoles(Set.of(role));

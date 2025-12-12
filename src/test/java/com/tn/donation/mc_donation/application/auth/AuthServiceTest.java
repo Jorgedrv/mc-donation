@@ -4,7 +4,6 @@ import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
 import com.tn.donation.mc_donation.common.exception.EmailAlreadyExistsException;
 import com.tn.donation.mc_donation.common.exception.RoleNotFoundException;
-import com.tn.donation.mc_donation.common.exception.UserAlreadyExistsException;
 import com.tn.donation.mc_donation.domain.enums.UserStatus;
 import com.tn.donation.mc_donation.infrastructure.messaging.EmailService;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.RoleJpaRepository;
@@ -60,7 +59,7 @@ class AuthServiceTest {
         String email = "test@mail.com";
 
         RegisterRequest request =
-                new RegisterRequest("testuser", email, "1234");
+                new RegisterRequest("Elon", "Musk", email, "1234");
 
         when(userJpaRepository.existsByEmail("test@mail.com")).thenReturn(true);
 
@@ -68,7 +67,6 @@ class AuthServiceTest {
                 () -> authService.register(request));
 
         verify(userJpaRepository).existsByEmail("test@mail.com");
-        verify(userJpaRepository, never()).existsByUsername(anyString());
         verify(roleJpaRepository, never()).findByName(anyString());
         verify(userJpaRepository, never()).save(any());
     }
@@ -76,32 +74,29 @@ class AuthServiceTest {
     @Test
     void register_notExistByUsernameShouldThrowException() {
         String email = "test@mail.com";
-        String username = "testuser";
 
         RegisterRequest request =
-                new RegisterRequest(username, email, "1234");
+                new RegisterRequest("Elon", "Musk", email, "1234");
 
         when(userJpaRepository.existsByEmail("test@mail.com")).thenReturn(false);
 
-        when(userJpaRepository.existsByUsername(username)).thenReturn(true);
-
-        assertThrows(UserAlreadyExistsException.class,
+        assertThrows(RoleNotFoundException.class,
                 () -> authService.register(request));
 
         verify(userJpaRepository, times(1)).existsByEmail(email);
-        verify(userJpaRepository).existsByUsername(username);
-        verify(roleJpaRepository, never()).findByName(anyString());
         verify(userJpaRepository, never()).save(any());
     }
 
     @Test
     void register_roleFindByNameShouldThrowException() {
+        String email = "test@mail.com";
+        String name = "Elon";
+        String lastname = "Musk";
+
         RegisterRequest request =
-                new RegisterRequest("testuser", "testuser@test.com", "1234");
+                new RegisterRequest(name, lastname, email, "1234");
 
-        when(userJpaRepository.existsByEmail("testuser@test.com")).thenReturn(false);
-
-        when(userJpaRepository.existsByUsername("testuser")).thenReturn(false);
+        when(userJpaRepository.existsByEmail(email)).thenReturn(false);
 
         when(roleJpaRepository.findByName(anyString()))
                 .thenThrow(new RoleNotFoundException("USER"));
@@ -109,20 +104,22 @@ class AuthServiceTest {
         assertThrows(RoleNotFoundException.class,
                 () -> authService.register(request));
 
-        verify(userJpaRepository, times(1)).existsByEmail("testuser@test.com");
-        verify(userJpaRepository, times(1)).existsByUsername("testuser");
+        verify(userJpaRepository, times(1)).existsByEmail(email);
         verify(userJpaRepository, never()).save(any());
     }
 
     @Test
     void register_shouldSaveUserSuccessfully() {
+        String email = "test@mail.com";
+        String name = "Elon";
+        String lastname = "Musk";
+
         RegisterRequest request =
-                new RegisterRequest("testuser", "test@mail.com", "1234");
+                new RegisterRequest(name, lastname, email, "1234");
 
         String token = "a81b2d73-5de4-4495-b851-98ab3c69ddb6";
 
         when(userJpaRepository.existsByEmail("test@mail.com")).thenReturn(false);
-        when(userJpaRepository.existsByUsername("testuser")).thenReturn(false);
 
         MenuEntity menu = new MenuEntity();
         menu.setId(1L);
@@ -137,7 +134,8 @@ class AuthServiceTest {
         UserEntity saved = new UserEntity();
         saved.setId(1L);
         saved.setPassword("1234");
-        saved.setUsername("testuser");
+        saved.setName(name);
+        saved.setLastname(lastname);
         saved.setEmail("test@mail.com");
         saved.setStatus(UserStatus.PENDING);
 
@@ -154,7 +152,8 @@ class AuthServiceTest {
 
         assertNotNull(response);
         assertEquals(1L, response.id());
-        assertEquals("testuser", response.username());
+        assertEquals("Elon", response.name());
+        assertEquals("Musk", response.lastname());
         assertEquals("test@mail.com", response.email());
         assertEquals("User registered successfully. Please check your email to verify your account.",
                 response.message());
