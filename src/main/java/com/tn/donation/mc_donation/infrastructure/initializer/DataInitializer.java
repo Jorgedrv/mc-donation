@@ -52,9 +52,11 @@ public class DataInitializer implements CommandLineRunner {
                         new RoleEntity(null, "USER", Set.of(savedMenu))
                 ));
 
-        if (userJpaRepository.findByUsername("admin").isEmpty()) {
+        if (userJpaRepository.findByEmail("admin@local.com").isEmpty()) {
             UserEntity admin = new UserEntity();
-            admin.setUsername("admin");
+            admin.setName("Admin");
+            admin.setLastname("Last Admin");
+            admin.setEmail("admin");
             admin.setEmail("admin@local.com");
             admin.setPassword(encoder.encode("admin123"));
 

@@ -4,7 +4,6 @@ import com.tn.donation.mc_donation.api.dto.RegisterRequest;
 import com.tn.donation.mc_donation.api.dto.RegisterResponse;
 import com.tn.donation.mc_donation.common.exception.EmailAlreadyExistsException;
 import com.tn.donation.mc_donation.common.exception.RoleNotFoundException;
-import com.tn.donation.mc_donation.common.exception.UserAlreadyExistsException;
 import com.tn.donation.mc_donation.domain.enums.UserStatus;
 import com.tn.donation.mc_donation.infrastructure.messaging.EmailService;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.RoleJpaRepository;
@@ -30,15 +29,12 @@ public class AuthService {
             throw new EmailAlreadyExistsException(request.email());
         }
 
-        if (userJpaRepository.existsByUsername(request.username())) {
-            throw new UserAlreadyExistsException(request.username());
-        }
-
         RoleEntity userRole = roleJpaRepository.findByName("USER")
                 .orElseThrow(() -> new RoleNotFoundException("USER role not found"));
 
         UserEntity user = new UserEntity();
-        user.setUsername(request.username());
+        user.setName(request.name());
+        user.setLastname(request.lastname());
         user.setEmail(request.email());
         user.setPassword(encoder.encode(request.password()));
         user.getRoles().add(userRole);
@@ -52,7 +48,8 @@ public class AuthService {
 
         return new RegisterResponse(
                 saved.getId(),
-                saved.getUsername(),
+                saved.getName(),
+                saved.getLastname(),
                 saved.getEmail(),
                 "User registered successfully. Please check your email to verify your account."
         );

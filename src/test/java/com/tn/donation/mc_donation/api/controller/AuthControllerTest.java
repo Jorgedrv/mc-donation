@@ -95,18 +95,21 @@ class AuthControllerTest {
 
     @Test
     void register_shouldReturnUserAndOkResponse() {
-        String username = "admin";
+        String name = "Elon";
+        String lastname = "Musk";
         String email = "admin@test.com";
 
         RegisterRequest request = new RegisterRequest(
-                username,
+                name,
+                lastname,
                 email,
                 "admin1234"
         );
 
         RegisterResponse response = new RegisterResponse(
                 1L,
-                username,
+                name,
+                lastname,
                 email,
                 "User registered successfully"
         );
@@ -119,7 +122,8 @@ class AuthControllerTest {
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result.getBody());
         assertEquals(1L, result.getBody().id());
-        assertEquals(username, result.getBody().username());
+        assertEquals(name, result.getBody().name());
+        assertEquals(lastname, result.getBody().lastname());
         assertEquals(email, result.getBody().email());
         assertEquals("User registered successfully", result.getBody().message());
 
@@ -131,7 +135,8 @@ class AuthControllerTest {
         String message = "Email verified successfully. You can now log in.";
 
         UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("testuser");
+        userEntity.setName("Elon");
+        userEntity.setLastname("Musk");
         userEntity.setEmail("testuser@test.com");
         userEntity.setStatus(UserStatus.PENDING);
 

@@ -68,7 +68,7 @@ class JwtAuthenticationFilterTest {
         filter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, never()).extractUsername(any());
+        verify(jwtService, never()).extractEmail(any());
     }
 
     @Test
@@ -78,13 +78,13 @@ class JwtAuthenticationFilterTest {
         filter.doFilterInternal(request, response, filterChain);
 
         verify(filterChain, times(1)).doFilter(request, response);
-        verify(jwtService, never()).extractUsername(any());
+        verify(jwtService, never()).extractEmail(any());
     }
 
     @Test
     void doFilterInternal_shouldReturnInvalidTokenError() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer bad.token");
-        when(jwtService.extractUsername("bad.token")).thenThrow(new JwtException("Invalid"));
+        when(jwtService.extractEmail("bad.token")).thenThrow(new JwtException("Invalid"));
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -95,7 +95,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void doFilterInternal_shouldReturnExpiredTokenError() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer abc123");
-        when(jwtService.extractUsername("abc123")).thenThrow(new ExpiredJwtException(null, null, "expired"));
+        when(jwtService.extractEmail("abc123")).thenThrow(new ExpiredJwtException(null, null, "expired"));
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -106,7 +106,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void shouldNotAuthenticateWhenUsernameIsNull() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer token123");
-        when(jwtService.extractUsername("token123")).thenReturn(null);
+        when(jwtService.extractEmail("token123")).thenReturn(null);
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -119,14 +119,14 @@ class JwtAuthenticationFilterTest {
     @Test
     void shouldNotAuthenticateWhenTokenIsInvalid() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer token123");
-        when(jwtService.extractUsername("token123")).thenReturn("peter");
+        when(jwtService.extractEmail("token123")).thenReturn("usertest@test.com");
 
-        UserDetails user = User.withUsername("peter")
+        UserDetails user = User.withUsername("usertest@test.com")
                 .password("123")
                 .roles("ADMIN")
                 .build();
 
-        when(uds.loadUserByUsername("peter")).thenReturn(user);
+        when(uds.loadUserByUsername("usertest@test.com")).thenReturn(user);
         when(jwtService.isTokenValid("token123", user)).thenReturn(false);
 
         filter.doFilterInternal(request, response, filterChain);
@@ -138,7 +138,7 @@ class JwtAuthenticationFilterTest {
     @Test
     void doFilterInternal_shouldSkipAuthenticationWhenContextAlreadyHasAuth() throws Exception {
         when(request.getHeader("Authorization")).thenReturn("Bearer abc123");
-        when(jwtService.extractUsername("abc123")).thenReturn("Peter");
+        when(jwtService.extractEmail("abc123")).thenReturn("usertest@test.com");
 
         Authentication existingAuth =
                 new UsernamePasswordAuthenticationToken("ExistingUser", null, Collections.emptyList());
@@ -156,16 +156,18 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldAuthenticateUserWhenTokenValid() throws Exception {
+        String email = "usertest@test.com";
+
         when(request.getHeader("Authorization")).thenReturn("Bearer good123");
-        when(jwtService.extractUsername("good123")).thenReturn("Peter");
+        when(jwtService.extractEmail("good123")).thenReturn(email);
 
         UserDetails user = org.springframework.security.core.userdetails.User
-                .withUsername("Peter")
+                .withUsername(email)
                 .password("123")
                 .roles("ADMIN")
                 .build();
 
-        when(uds.loadUserByUsername("Peter")).thenReturn(user);
+        when(uds.loadUserByUsername(email)).thenReturn(user);
         when(jwtService.isTokenValid("good123", user)).thenReturn(true);
 
         filter.doFilterInternal(request, response, filterChain);
@@ -173,7 +175,7 @@ class JwtAuthenticationFilterTest {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         assertNotNull(auth);
-        assertEquals("Peter", auth.getName());
+        assertEquals(email, auth.getName());
 
         verify(filterChain, times(1)).doFilter(request, response);
     }

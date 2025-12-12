@@ -31,7 +31,7 @@ class JwtServiceTest {
     @Test
     void generateToken_shouldContainUsername() {
         UserDetails userDetails = User.builder()
-                .username("Peter")
+                .username("usertest@test.com")
                 .password("12345")
                 .build();
 
@@ -39,9 +39,9 @@ class JwtServiceTest {
 
         assertNotNull(token);
 
-        String username = jwtService.extractUsername(token);
+        String username = jwtService.extractEmail(token);
 
-        assertEquals("Peter", username);
+        assertEquals("usertest@test.com", username);
     }
 
     @Test
@@ -78,12 +78,12 @@ class JwtServiceTest {
         jwtService = new JwtService("b1E9f7K2xP4qM0sT8vR6hC3uY5dW1nB8pL4mX7zT0qV9eS3", 1);
 
         UserDetails userDetails = User.builder()
-                .username("Peter")
+                .username("usertest@test.com")
                 .password("12345")
                 .build();
 
         String token = jwtService.generateToken(userDetails);
 
-        assertThrows(ExpiredJwtException.class, () -> jwtService.extractUsername(token));
+        assertThrows(ExpiredJwtException.class, () -> jwtService.extractEmail(token));
     }
 }
