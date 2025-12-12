@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,6 +93,18 @@ class AuthControllerTest {
 
         verify(authManager, times(1)).authenticate(any());
         verify(loginService, never()).buildLoginResponse(any());
+    }
+
+    @Test
+    void login_shouldReturn401_whenUserIsPending() {
+        LoginRequest request = new LoginRequest("test@mail.com", "12345");
+
+        when(authManager.authenticate(any()))
+                .thenThrow(new DisabledException("User is not verified"));
+
+        assertThrows(DisabledException.class, () -> authController.login(request));
+
+        verifyNoInteractions(loginService);
     }
 
     @Test

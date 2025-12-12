@@ -16,7 +16,9 @@ import org.springframework.security.core.Authentication;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
@@ -34,23 +36,7 @@ class LoginServiceTest {
 
     @Test
     void buildLoginResponse_shouldReturnTokenUserAndMenus() {
-        MenuEntity menu = new MenuEntity();
-        menu.setId(1L);
-        menu.setOrderIndex(1);
-        menu.setName("Dashboard");
-        menu.setPath("/dashboard");
-        menu.setIcon("iconoir:home");
-
-        RoleEntity role = new RoleEntity(1L, "ADMIN", Set.of(menu));
-
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1L);
-        userEntity.setPassword("1234");
-        userEntity.setName("Elon");
-        userEntity.setLastname("Musk");
-        userEntity.setEmail("test@mail.com");
-        userEntity.setStatus(UserStatus.PENDING);
-        userEntity.setRoles(Set.of(role));
+        UserEntity userEntity = getUserEntity(UserStatus.PENDING);
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
@@ -66,10 +52,62 @@ class LoginServiceTest {
         assertNotNull(loginResponse);
         assertEquals(1L, loginResponse.getUser().getId());
         assertEquals("test@mail.com", loginResponse.getUser().getEmail());
+        assertEquals("Elon", loginResponse.getUser().getName());
+        assertEquals("Musk", loginResponse.getUser().getLastname());
         assertEquals("/dashboard", loginResponse.getMenus().get(0).getPath());
         assertEquals(token, loginResponse.getToken());
+        assertFalse(customUserDetails.isEnabled());
 
         verify(authentication).getPrincipal();
         verify(jwtService).generateToken(customUserDetails);
+    }
+
+    @Test
+    void buildLoginResponse_shouldReturnTokenActiveUserAndMenus() {
+        UserEntity userEntity = getUserEntity(UserStatus.ACTIVE);
+
+        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+
+        when(authentication.getPrincipal()).thenReturn(customUserDetails);
+
+        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fakePayload.signature";
+
+        when(jwtService.generateToken(customUserDetails))
+                .thenReturn(token);
+
+        LoginResponse loginResponse = loginService.buildLoginResponse(authentication);
+
+        assertNotNull(loginResponse);
+        assertEquals(1L, loginResponse.getUser().getId());
+        assertEquals("Elon", loginResponse.getUser().getName());
+        assertEquals("Musk", loginResponse.getUser().getLastname());
+        assertEquals("test@mail.com", loginResponse.getUser().getEmail());
+        assertEquals("/dashboard", loginResponse.getMenus().get(0).getPath());
+        assertEquals(token, loginResponse.getToken());
+        assertTrue(customUserDetails.isEnabled());
+
+        verify(authentication).getPrincipal();
+        verify(jwtService).generateToken(customUserDetails);
+    }
+
+    private static UserEntity getUserEntity(UserStatus active) {
+        MenuEntity menu = new MenuEntity();
+        menu.setId(1L);
+        menu.setOrderIndex(1);
+        menu.setName("Dashboard");
+        menu.setPath("/dashboard");
+        menu.setIcon("iconoir:home");
+
+        RoleEntity role = new RoleEntity(1L, "ADMIN", Set.of(menu));
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        userEntity.setPassword("1234");
+        userEntity.setName("Elon");
+        userEntity.setLastname("Musk");
+        userEntity.setEmail("test@mail.com");
+        userEntity.setStatus(active);
+        userEntity.setRoles(Set.of(role));
+        return userEntity;
     }
 }

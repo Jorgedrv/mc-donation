@@ -1,5 +1,6 @@
 package com.tn.donation.mc_donation.application.security;
 
+import com.tn.donation.mc_donation.domain.enums.UserStatus;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,5 +26,10 @@ public record CustomUserDetails(UserEntity user) implements UserDetails {
     @Override
     public String getUsername() {
         return user.getEmail();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return user.getStatus() == UserStatus.ACTIVE;
     }
 }
