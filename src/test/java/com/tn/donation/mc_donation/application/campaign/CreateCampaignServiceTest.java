@@ -1,6 +1,7 @@
 package com.tn.donation.mc_donation.application.campaign;
 
 import com.tn.donation.mc_donation.api.dto.CreateCampaignRequest;
+import com.tn.donation.mc_donation.common.CampaignStatus;
 import com.tn.donation.mc_donation.domain.model.Campaign;
 import com.tn.donation.mc_donation.domain.repository.CampaignRepository;
 import org.junit.jupiter.api.Test;
@@ -29,12 +30,14 @@ class CreateCampaignServiceTest {
     void create_shouldSaveCampaign() {
         CreateCampaignRequest request = new CreateCampaignRequest(
                 "Support Homeless Children",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                null
         );
 
         when(campaignRepository.save(any(Campaign.class))).thenAnswer(invocation -> {
             Campaign c = invocation.getArgument(0);
-            return new Campaign(1L, c.getName(), c.getDescription());
+            return new Campaign(1L, c.getName(), c.getDescription(), c.getIcon(), c.getStatus());
         });
         Campaign response = createCampaignService.create(request);
 
@@ -43,7 +46,9 @@ class CreateCampaignServiceTest {
 
         verify(campaignRepository).save(argThat(saved ->
                 saved.getName().equals("Support Homeless Children") &&
-                        saved.getDescription().equals("Providing shelter and meals for vulnerable kids.")
+                        saved.getDescription().equals("Providing shelter and meals for vulnerable kids.") &&
+                        saved.getIcon().equals("iconoir:fire-flame") &&
+                        saved.getStatus().equals(CampaignStatus.ACTIVE)
         ));
     }
 }
