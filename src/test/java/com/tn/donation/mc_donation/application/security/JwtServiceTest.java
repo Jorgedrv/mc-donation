@@ -51,26 +51,29 @@ class JwtServiceTest {
                 .password("12345")
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
-
         assertTrue(jwtService.isTokenValid(userDetails));
     }
 
     @Test
     void tokenShouldBeInvalidForDifferentUser() {
-        UserDetails userDetails = User.builder()
-                .username("Peter")
+        UserDetails lockedUser = User.builder()
+                .username("usertest@test.com")
                 .password("12345")
+                .accountLocked(true)
                 .build();
 
-        String token = jwtService.generateToken(userDetails);
+        assertFalse(jwtService.isTokenValid(lockedUser));
+    }
 
-        UserDetails wrongUser = User.builder()
-                .username("John")
-                .password("whatever")
+    @Test
+    void tokenShouldBeInvalidForDisabledUser() {
+        UserDetails disabledUser = User.builder()
+                .username("usertest@test.com")
+                .password("12345")
+                .disabled(true)
                 .build();
 
-        assertFalse(jwtService.isTokenValid(wrongUser));
+        assertFalse(jwtService.isTokenValid(disabledUser));
     }
 
     @Test
