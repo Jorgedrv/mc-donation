@@ -48,7 +48,7 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        return extractEmail(token).equals(userDetails.getUsername());
+    public boolean isTokenValid(UserDetails userDetails) {
+        return userDetails.isEnabled() && userDetails.isAccountNonLocked();
     }
 }

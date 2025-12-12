@@ -53,7 +53,7 @@ class JwtServiceTest {
 
         String token = jwtService.generateToken(userDetails);
 
-        assertTrue(jwtService.isTokenValid(token, userDetails));
+        assertTrue(jwtService.isTokenValid(userDetails));
     }
 
     @Test
@@ -70,7 +70,7 @@ class JwtServiceTest {
                 .password("whatever")
                 .build();
 
-        assertFalse(jwtService.isTokenValid(token, wrongUser));
+        assertFalse(jwtService.isTokenValid(wrongUser));
     }
 
     @Test

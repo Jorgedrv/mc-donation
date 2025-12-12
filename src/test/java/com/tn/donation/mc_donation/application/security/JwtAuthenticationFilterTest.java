@@ -127,7 +127,7 @@ class JwtAuthenticationFilterTest {
                 .build();
 
         when(uds.loadUserByUsername("usertest@test.com")).thenReturn(user);
-        when(jwtService.isTokenValid("token123", user)).thenReturn(false);
+        when(jwtService.isTokenValid(user)).thenReturn(false);
 
         filter.doFilterInternal(request, response, filterChain);
 
@@ -168,7 +168,7 @@ class JwtAuthenticationFilterTest {
                 .build();
 
         when(uds.loadUserByUsername(email)).thenReturn(user);
-        when(jwtService.isTokenValid("good123", user)).thenReturn(true);
+        when(jwtService.isTokenValid(user)).thenReturn(true);
 
         filter.doFilterInternal(request, response, filterChain);
 
