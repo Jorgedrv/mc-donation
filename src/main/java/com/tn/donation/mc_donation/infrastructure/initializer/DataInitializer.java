@@ -5,6 +5,7 @@ import com.tn.donation.mc_donation.infrastructure.repository.jpa.UserJpaReposito
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.MenuEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.MenuJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
-@Profile("dev")
+@Profile("local")
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -23,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder encoder;
     private final UserJpaRepository userJpaRepository;
     private final RoleJpaRepository roleJpaRepository;
+    private final MenuJpaRepository menuJpaRepository;
 
     private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
 
@@ -36,11 +38,19 @@ public class DataInitializer implements CommandLineRunner {
         menu.setIcon("iconoir:fire-flame");
         menu.setOrderIndex(2);
 
+        menu = menuJpaRepository.save(menu);
+
+        MenuEntity savedMenu = menu;
+
         RoleEntity adminRole = roleJpaRepository.findByName("ADMIN")
-                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "ADMIN", Set.of(menu))));
+                .orElseGet(() -> roleJpaRepository.save(
+                        new RoleEntity(null, "ADMIN", Set.of(savedMenu))
+                ));
 
         RoleEntity userRole = roleJpaRepository.findByName("USER")
-                .orElseGet(() -> roleJpaRepository.save(new RoleEntity(null, "USER", Set.of(menu))));
+                .orElseGet(() -> roleJpaRepository.save(
+                        new RoleEntity(null, "USER", Set.of(savedMenu))
+                ));
 
         if (userJpaRepository.findByUsername("admin").isEmpty()) {
             UserEntity admin = new UserEntity();

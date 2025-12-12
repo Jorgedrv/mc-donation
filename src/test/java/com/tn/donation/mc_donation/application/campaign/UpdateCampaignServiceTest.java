@@ -1,6 +1,7 @@
 package com.tn.donation.mc_donation.application.campaign;
 
 import com.tn.donation.mc_donation.api.dto.CreateCampaignRequest;
+import com.tn.donation.mc_donation.common.CampaignStatus;
 import com.tn.donation.mc_donation.common.exception.CampaignNotFoundException;
 import com.tn.donation.mc_donation.domain.model.Campaign;
 import com.tn.donation.mc_donation.domain.repository.CampaignRepository;
@@ -36,12 +37,16 @@ class UpdateCampaignServiceTest {
         Campaign existing = new Campaign(
                 id,
                 "Support Homeless Children",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         CreateCampaignRequest request = new CreateCampaignRequest(
                 "Emergency Shelter Program",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         when(campaignRepository.findById(id)).thenReturn(Optional.of(existing));
@@ -55,7 +60,10 @@ class UpdateCampaignServiceTest {
         verify(campaignRepository).findById(id);
         verify(campaignRepository).save(argThat(updated ->
                 updated.getName().equals("Emergency Shelter Program") &&
-                        updated.getDescription().equals("Providing shelter and meals for vulnerable kids.")
+                        updated.getDescription().equals("Providing shelter and meals for vulnerable kids.") &&
+                        updated.getIcon().equals("iconoir:fire-flame") &&
+                        updated.getStatus().equals(CampaignStatus.ACTIVE)
+
         ));
     }
 
@@ -67,7 +75,9 @@ class UpdateCampaignServiceTest {
 
         CreateCampaignRequest request = new CreateCampaignRequest(
                 "Emergency Shelter Program",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         assertThrows(CampaignNotFoundException.class,

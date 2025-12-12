@@ -7,6 +7,7 @@ import com.tn.donation.mc_donation.application.campaign.DeleteCampaignService;
 import com.tn.donation.mc_donation.application.campaign.GetCampaignsService;
 import com.tn.donation.mc_donation.application.campaign.ListCampaignsService;
 import com.tn.donation.mc_donation.application.campaign.UpdateCampaignService;
+import com.tn.donation.mc_donation.common.CampaignStatus;
 import com.tn.donation.mc_donation.domain.model.Campaign;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,7 +58,9 @@ class CampaignControllerTest {
         Campaign campaign = new Campaign(
                 1L,
                 "Support Homeless Children",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                null
         );
 
         when(createCampaignService.create(any(CreateCampaignRequest.class))).thenReturn(campaign);
@@ -76,7 +79,9 @@ class CampaignControllerTest {
                 new Campaign(
                         1L,
                         "Support Homeless Children",
-                        "Providing shelter and meals for vulnerable kids."
+                        "Providing shelter and meals for vulnerable kids.",
+                        "iconoir:fire-flame",
+                        CampaignStatus.ACTIVE
                 )
         );
         when(listCampaignsService.findAll()).thenReturn(campaigns);
@@ -96,7 +101,9 @@ class CampaignControllerTest {
         Campaign campaign = new Campaign(
                 id,
                 "Support Homeless Children",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         when(getCampaignsService.findById(id)).thenReturn(campaign);
@@ -115,12 +122,16 @@ class CampaignControllerTest {
         Long id = 1L;
         CreateCampaignRequest request = new CreateCampaignRequest(
                 "Emergency Shelter Program",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
         Campaign campaign = new Campaign(
                 id,
                 "Emergency Shelter Program",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         when(updateCampaignService.update(id, request)).thenReturn(campaign);
