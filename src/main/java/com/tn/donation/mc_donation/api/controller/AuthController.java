@@ -44,7 +44,7 @@ public class AuthController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.username(), request.password()
+                        request.username().trim().toLowerCase(), request.password()
                 )
         );
         LoginResponse response = loginService.buildLoginResponse(auth);
