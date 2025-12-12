@@ -8,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,32 +39,33 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
-                        // --- PUBLIC ---
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/auth/verify").permitAll()
+        http.cors(Customizer.withDefaults())
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                    // --- PUBLIC ---
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                    .requestMatchers("/actuator/health").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/auth/verify").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, CAMPAIGNS_PATTERN).permitAll()
-                        .requestMatchers(HttpMethod.GET, DONATIONS_PATTERN).permitAll()
-                        .requestMatchers(HttpMethod.POST, DONATIONS_PATTERN).permitAll()
+                    .requestMatchers(HttpMethod.GET, CAMPAIGNS_PATTERN).permitAll()
+                    .requestMatchers(HttpMethod.GET, DONATIONS_PATTERN).permitAll()
+                    .requestMatchers(HttpMethod.POST, DONATIONS_PATTERN).permitAll()
 
-                        // --- PRIVATE (ADMIN ONLY) ---
-                        .requestMatchers(HttpMethod.POST, CAMPAIGNS_PATTERN).hasRole(ADMIN)
-                        .requestMatchers(HttpMethod.PUT, CAMPAIGNS_PATTERN).hasRole(ADMIN)
-                        .requestMatchers(HttpMethod.DELETE, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+                    // --- PRIVATE (ADMIN ONLY) ---
+                    .requestMatchers(HttpMethod.POST, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.PUT, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.DELETE, CAMPAIGNS_PATTERN).hasRole(ADMIN)
 
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
+                    .anyRequest().authenticated()
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

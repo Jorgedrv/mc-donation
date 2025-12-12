@@ -23,8 +23,16 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         entity.setId(campaign.getId());
         entity.setName(campaign.getName());
         entity.setDescription(campaign.getDescription());
+        entity.setIcon(campaign.getIcon());
+        entity.setStatus(campaign.getStatus());
         CampaignEntity saved = campaignRepository.save(entity);
-        return new Campaign(saved.getId(), saved.getName(), saved.getDescription());
+        return new Campaign(
+                saved.getId(),
+                saved.getName(),
+                saved.getDescription(),
+                saved.getIcon(),
+                saved.getStatus()
+        );
     }
 
     @Override
@@ -34,7 +42,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
                 .map(entity -> new Campaign(
                         entity.getId(),
                         entity.getName(),
-                        entity.getDescription()
+                        entity.getDescription(),
+                        entity.getIcon(),
+                        entity.getStatus()
                 ))
                 .toList();
     }
@@ -45,7 +55,9 @@ public class CampaignRepositoryImpl implements CampaignRepository {
                 .map(entity -> new Campaign(
                         entity.getId(),
                         entity.getName(),
-                        entity.getDescription()
+                        entity.getDescription(),
+                        entity.getIcon(),
+                        entity.getStatus()
                 ));
     }
 

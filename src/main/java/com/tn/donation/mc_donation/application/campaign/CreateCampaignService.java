@@ -13,7 +13,12 @@ public class CreateCampaignService {
     private final CampaignRepository campaignRepository;
 
     public Campaign create(CreateCampaignRequest request) {
-        Campaign campaign = new Campaign(request.getName(), request.getDescription());
+        Campaign campaign = new Campaign(
+                request.getName(),
+                request.getDescription(),
+                request.getIcon(),
+                request.getStatus()
+        );
         return campaignRepository.save(campaign);
     }
 }
