@@ -1,5 +1,6 @@
 package com.tn.donation.mc_donation.application.campaign;
 
+import com.tn.donation.mc_donation.common.CampaignStatus;
 import com.tn.donation.mc_donation.common.exception.CampaignNotFoundException;
 import com.tn.donation.mc_donation.domain.model.Campaign;
 import com.tn.donation.mc_donation.domain.repository.CampaignRepository;
@@ -33,7 +34,9 @@ class GetCampaignsServiceTest {
         Campaign campaign = new Campaign(
                 id,
                 "Support Homeless Children",
-                "Providing shelter and meals for vulnerable kids."
+                "Providing shelter and meals for vulnerable kids.",
+                "iconoir:fire-flame",
+                CampaignStatus.ACTIVE
         );
 
         when(campaignRepository.findById(id)).thenReturn(Optional.of(campaign));

@@ -12,7 +12,9 @@ public class CampaignMapper {
         return new CampaignResponse(
                 campaign.getId(),
                 campaign.getName(),
-                campaign.getDescription()
+                campaign.getDescription(),
+                campaign.getIcon(),
+                campaign.getStatus()
         );
     }
 }

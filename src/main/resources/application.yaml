@@ -8,8 +8,8 @@ spring:
   mail:
     host: email-smtp.us-east-2.amazonaws.com
     port: 587
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
+    username: ${SMTP_USERNAME:AKIAXZ5OR22SUO236QO2}
+    password: ${SMTP_PASSWORD:BBbNvE9YHxZ4nrA3XJGPKAkh5O5qaHGkQm5xlD8nIs1U}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
