@@ -1,13 +1,13 @@
 package com.tn.donation.mc_donation.api.controller;
 
-import com.tn.donation.mc_donation.api.dto.LoginRequest;
-import com.tn.donation.mc_donation.api.dto.LoginResponse;
-import com.tn.donation.mc_donation.api.dto.RegisterRequest;
-import com.tn.donation.mc_donation.api.dto.RegisterResponse;
+import com.tn.donation.mc_donation.api.dto.*;
 import com.tn.donation.mc_donation.application.auth.AuthService;
 import com.tn.donation.mc_donation.application.auth.LoginService;
 import com.tn.donation.mc_donation.application.auth.VerificationTokenService;
 import com.tn.donation.mc_donation.domain.enums.UserStatus;
+import com.tn.donation.mc_donation.domain.model.User;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.MenuEntity;
+import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.RoleEntity;
 import com.tn.donation.mc_donation.infrastructure.repository.jpa.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +20,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -163,5 +165,37 @@ class AuthControllerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(message, response.getBody());
+    }
+
+    @Test
+    void me_shouldReturnOk_whenAuthenticationExists() {
+        Long id = 1L;
+
+        MenuEntity menuEntity = new MenuEntity();
+        menuEntity.setId(id);
+        menuEntity.setIcon("\uD83D\uDCCA");
+        menuEntity.setPath("/dashboard");
+        menuEntity.setOrderIndex(1);
+        menuEntity.setName("Dashboard");
+
+        RoleEntity role = new RoleEntity();
+        role.setId(id);
+        role.setName("ADMIN");
+        role.setMenus(Set.of(menuEntity));
+
+        User user = new User(
+                id,
+                "elon",
+                "musk",
+                "elonmusk@test.com",
+                true,
+                UserStatus.ACTIVE,
+                Set.of(role)
+        );
+
+        when(authentication.getPrincipal()).thenReturn(user);
+
+        ResponseEntity<UserResponse> response = authController.me(authentication);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }

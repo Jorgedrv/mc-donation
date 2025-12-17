@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CampaignRepositoryImpl implements CampaignRepository {
 
-    private final CampaignJpaRepository campaignRepository;
+    private final CampaignJpaRepository campaignJpaRepository;
 
     @Override
     public Campaign save(Campaign campaign) {
@@ -25,7 +25,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
         entity.setDescription(campaign.getDescription());
         entity.setIcon(campaign.getIcon());
         entity.setStatus(campaign.getStatus());
-        CampaignEntity saved = campaignRepository.save(entity);
+        CampaignEntity saved = campaignJpaRepository.save(entity);
         return new Campaign(
                 saved.getId(),
                 saved.getName(),
@@ -37,7 +37,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
     @Override
     public List<Campaign> findAll() {
-        return campaignRepository.findAll()
+        return campaignJpaRepository.findAll()
                 .stream()
                 .map(entity -> new Campaign(
                         entity.getId(),
@@ -51,7 +51,7 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
     @Override
     public Optional<Campaign> findById(Long id) {
-        return campaignRepository.findById(id)
+        return campaignJpaRepository.findById(id)
                 .map(entity -> new Campaign(
                         entity.getId(),
                         entity.getName(),
@@ -63,6 +63,6 @@ public class CampaignRepositoryImpl implements CampaignRepository {
 
     @Override
     public void delete(Campaign campaign) {
-        campaignRepository.deleteById(campaign.getId());
+        campaignJpaRepository.deleteById(campaign.getId());
     }
 }
