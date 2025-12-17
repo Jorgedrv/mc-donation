@@ -1,12 +1,11 @@
 package com.tn.donation.mc_donation.api.controller;
 
-import com.tn.donation.mc_donation.api.dto.LoginRequest;
-import com.tn.donation.mc_donation.api.dto.LoginResponse;
-import com.tn.donation.mc_donation.api.dto.RegisterRequest;
-import com.tn.donation.mc_donation.api.dto.RegisterResponse;
+import com.tn.donation.mc_donation.api.dto.*;
+import com.tn.donation.mc_donation.api.mapper.UserMapper;
 import com.tn.donation.mc_donation.application.auth.AuthService;
 import com.tn.donation.mc_donation.application.auth.LoginService;
 import com.tn.donation.mc_donation.application.auth.VerificationTokenService;
+import com.tn.donation.mc_donation.domain.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -73,5 +72,11 @@ public class AuthController {
     public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
         verificationTokenService.verifyToken(token);
         return ResponseEntity.ok("Email verified successfully. You can now log in.");
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return ResponseEntity.ok(UserMapper.toUserResponse(user));
     }
 }

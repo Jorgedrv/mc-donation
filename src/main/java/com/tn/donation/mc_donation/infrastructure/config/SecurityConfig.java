@@ -30,6 +30,7 @@ public class SecurityConfig {
 
     private static final String DONATIONS_PATTERN = "/donations/**";
     private static final String CAMPAIGNS_PATTERN = "/campaigns/**";
+    private static final String USERS_PATTERN = "/users/**";
     private static final String ADMIN = "ADMIN";
 
     public SecurityConfig(JwtAuthenticationFilter jwtFilter, MyUserDetailsService myUserDetailsService) {
@@ -37,6 +38,7 @@ public class SecurityConfig {
         this.myUserDetailsService = myUserDetailsService;
     }
 
+    @SuppressWarnings("java:S4502")
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
@@ -61,6 +63,12 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST, CAMPAIGNS_PATTERN).hasRole(ADMIN)
                     .requestMatchers(HttpMethod.PUT, CAMPAIGNS_PATTERN).hasRole(ADMIN)
                     .requestMatchers(HttpMethod.DELETE, CAMPAIGNS_PATTERN).hasRole(ADMIN)
+
+                    .requestMatchers(HttpMethod.PUT, USERS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.PATCH, USERS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.GET, USERS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.DELETE, USERS_PATTERN).hasRole(ADMIN)
+                    .requestMatchers(HttpMethod.GET, "/auth/me").authenticated()
 
                     .anyRequest().authenticated()
             )
